@@ -1,0 +1,757 @@
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class TravelplannersystemApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(TravelplannersystemApplication.class, args);
+	}
+
+}package com.example.demo.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+
+		registry.addMapping("/**")
+		.allowedOrigins("*")
+		.allowedMethods("*")
+		.allowedHeaders("*");
+
+	}
+}package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/admin")
+public class AdminController {
+
+	@GetMapping
+	public String adminDashboard(){
+		return "Admin Dashboard Working";
+	}
+}package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.entity.Destination;
+import com.example.demo.service.DestinationService;
+
+@RestController
+@RequestMapping("/destinations")
+@CrossOrigin("*")
+public class DestinationController {
+
+	@Autowired
+	private DestinationService service;
+
+	@PostMapping
+	public Destination addDestination(@RequestBody Destination d){
+		return service.addDestination(d);
+	}
+
+	@GetMapping
+	public List<Destination> getAll(){
+		return service.getAllDestinations();
+	}
+
+	@GetMapping("/recommend/{type}")
+	public List<Destination> recommend(@PathVariable String type){
+		return service.recommend(type);
+	}
+}package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.entity.User;
+import com.example.demo.service.UserService;
+
+@RestController
+@RequestMapping("/api/users")
+@CrossOrigin("*")
+public class UserController {
+
+	@Autowired
+	private UserService service;
+
+	@PostMapping("/register")
+	public User register(@RequestBody User user){
+		return service.register(user);
+	}
+
+	@PostMapping("/login")
+	public User login(@RequestBody LoginRequest request){
+		return service.login(request.getEmail(), request.getPassword());
+	}
+}package com.example.demo.dto;
+
+public class LoginRequest {
+
+	private String email;
+	private String password;
+
+	public LoginRequest() {}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+}package com.example.demo.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Destination {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private String name;
+	private String country;
+	private String type;
+	private double budget;
+	private String description;
+	private double rating;
+
+	public Destination() {}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public double getBudget() {
+		return budget;
+	}
+
+	public void setBudget(double budget) {
+		this.budget = budget;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public double getRating() {
+		return rating;
+	}
+
+	public void setRating(double rating) {
+		this.rating = rating;
+	}
+}package com.example.demo.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+public class TravelHistory {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private Long userId;
+	private Long destinationId;
+	private String travelDate;
+	private int rating;
+
+	public TravelHistory(){}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public Long getDestinationId() {
+		return destinationId;
+	}
+
+	public void setDestinationId(Long destinationId) {
+		this.destinationId = destinationId;
+	}
+
+	public String getTravelDate() {
+		return travelDate;
+	}
+
+	public void setTravelDate(String travelDate) {
+		this.travelDate = travelDate;
+	}
+
+	public int getRating() {
+		return rating;
+	}
+
+	public void setRating(int rating) {
+		this.rating = rating;
+	}
+}package com.example.demo.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+public class User {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private String name;
+	private String email;
+	private String password;
+
+	public User() {}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+}package com.example.demo.repository;
+
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.demo.entity.Destination;
+
+public interface DestinationRepository extends JpaRepository<Destination, Long>{
+
+	List<Destination> findByType(String type);
+
+}package com.example.demo.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.demo.entity.User;
+
+public interface UserRepository extends JpaRepository<User, Long>{
+
+	User findByEmail(String email);
+
+}package com.example.demo.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.entity.Destination;
+import com.example.demo.repository.DestinationRepository;
+
+@Service
+public class DestinationService {
+
+	@Autowired
+	private DestinationRepository repository;
+
+	public Destination addDestination(Destination d){
+		return repository.save(d);
+	}
+
+	public List<Destination> getAllDestinations(){
+		return repository.findAll();
+	}
+
+	public List<Destination> recommend(String type){
+		return repository.findByType(type);
+	}
+}package com.example.demo.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
+
+@Service
+public class UserService {
+
+	@Autowired
+	private UserRepository repository;
+
+	public User register(User user){
+		return repository.save(user);
+	}
+
+	public User login(String email,String password){
+
+		User user = repository.findByEmail(email);
+
+		if(user!=null && user.getPassword().equals(password)){
+			return user;
+		}
+
+		return null;
+	}
+}package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class TravelplannersystemApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(TravelplannersystemApplication.class, args);
+	}
+
+}package com.example.demo.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+
+		registry.addMapping("/**")
+		.allowedOrigins("*")
+		.allowedMethods("*")
+		.allowedHeaders("*");
+
+	}
+}package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/admin")
+public class AdminController {
+
+	@GetMapping
+	public String adminDashboard(){
+		return "Admin Dashboard Working";
+	}
+}package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.entity.Destination;
+import com.example.demo.service.DestinationService;
+
+@RestController
+@RequestMapping("/destinations")
+@CrossOrigin("*")
+public class DestinationController {
+
+	@Autowired
+	private DestinationService service;
+
+	@PostMapping
+	public Destination addDestination(@RequestBody Destination d){
+		return service.addDestination(d);
+	}
+
+	@GetMapping
+	public List<Destination> getAll(){
+		return service.getAllDestinations();
+	}
+
+	@GetMapping("/recommend/{type}")
+	public List<Destination> recommend(@PathVariable String type){
+		return service.recommend(type);
+	}
+}package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.entity.User;
+import com.example.demo.service.UserService;
+
+@RestController
+@RequestMapping("/api/users")
+@CrossOrigin("*")
+public class UserController {
+
+	@Autowired
+	private UserService service;
+
+	@PostMapping("/register")
+	public User register(@RequestBody User user){
+		return service.register(user);
+	}
+
+	@PostMapping("/login")
+	public User login(@RequestBody LoginRequest request){
+		return service.login(request.getEmail(), request.getPassword());
+	}
+}package com.example.demo.dto;
+
+public class LoginRequest {
+
+	private String email;
+	private String password;
+
+	public LoginRequest() {}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+}package com.example.demo.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Destination {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private String name;
+	private String country;
+	private String type;
+	private double budget;
+	private String description;
+	private double rating;
+
+	public Destination() {}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public double getBudget() {
+		return budget;
+	}
+
+	public void setBudget(double budget) {
+		this.budget = budget;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public double getRating() {
+		return rating;
+	}
+
+	public void setRating(double rating) {
+		this.rating = rating;
+	}
+}package com.example.demo.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+public class TravelHistory {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private Long userId;
+	private Long destinationId;
+	private String travelDate;
+	private int rating;
+
+	public TravelHistory(){}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public Long getDestinationId() {
+		return destinationId;
+	}
+
+	public void setDestinationId(Long destinationId) {
+		this.destinationId = destinationId;
+	}
+
+	public String getTravelDate() {
+		return travelDate;
+	}
+
+	public void setTravelDate(String travelDate) {
+		this.travelDate = travelDate;
+	}
+
+	public int getRating() {
+		return rating;
+	}
+
+	public void setRating(int rating) {
+		this.rating = rating;
+	}
+}package com.example.demo.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+public class User {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private String name;
+	private String email;
+	private String password;
+
+	public User() {}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+}package com.example.demo.repository;
+
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.demo.entity.Destination;
+
+public interface DestinationRepository extends JpaRepository<Destination, Long>{
+
+	List<Destination> findByType(String type);
+
+}package com.example.demo.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.demo.entity.User;
+
+public interface UserRepository extends JpaRepository<User, Long>{
+
+	User findByEmail(String email);
+
+}package com.example.demo.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.entity.Destination;
+import com.example.demo.repository.DestinationRepository;
+
+@Service
+public class DestinationService {
+
+	@Autowired
+	private DestinationRepository repository;
+
+	public Destination addDestination(Destination d){
+		return repository.save(d);
+	}
+
+	public List<Destination> getAllDestinations(){
+		return repository.findAll();
+	}
+
+	public List<Destination> recommend(String type){
+		return repository.findByType(type);
+	}
+}package com.example.demo.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
+
+@Service
+public class UserService {
+
+	@Autowired
+	private UserRepository repository;
+
+	public User register(User user){
+		return repository.save(user);
+	}
+
+	public User login(String email,String password){
+
+		User user = repository.findByEmail(email);
+
+		if(user!=null && user.getPassword().equals(password)){
+			return user;
+		}
+
+		return null;
+	}
+}
